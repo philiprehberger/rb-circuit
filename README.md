@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/philiprehberger/rb-circuit/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-circuit/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-circuit.svg)](https://rubygems.org/gems/philiprehberger-circuit)
+[![License](https://img.shields.io/github/license/philiprehberger/rb-circuit)](LICENSE)
 
 Minimal circuit breaker — three states (closed/open/half-open), configurable thresholds, error class filtering, and event callbacks.
 
