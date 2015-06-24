@@ -2,6 +2,10 @@
 
 require_relative 'circuit/version'
 require_relative 'circuit/state'
+require_relative 'circuit/metrics'
+require_relative 'circuit/callbacks'
+require_relative 'circuit/backoff'
+require_relative 'circuit/execution'
 require_relative 'circuit/breaker'
 
 module Philiprehberger
