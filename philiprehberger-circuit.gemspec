@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Philip Rehberger']
   spec.email         = ['me@philiprehberger.com']
 
-  spec.summary       = 'Minimal circuit breaker with three states and configurable thresholds'
+  spec.summary       = 'Minimal circuit breaker with configurable thresholds, error filtering, and exponential backoff'
   spec.description   = 'Circuit breaker pattern with closed, open, and half-open states, ' \
                        'configurable failure thresholds, timeout, error class filtering, ' \
                        'event callbacks, metrics, and exponential backoff.'
