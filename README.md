@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/rb-circuit/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-circuit/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-circuit.svg)](https://rubygems.org/gems/philiprehberger-circuit)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-circuit)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Minimal circuit breaker with configurable thresholds, error filtering, and exponential backoff
 
@@ -143,4 +144,4 @@ bundle exec rubocop
 
 ## License
 
-MIT
+[MIT](LICENSE)
