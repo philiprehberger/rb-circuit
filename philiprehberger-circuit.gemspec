@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Minimal circuit breaker with configurable thresholds, error filtering, and exponential backoff'
   spec.description = 'Circuit breaker pattern with closed, open, and half-open states, ' \
-                       'configurable failure thresholds, timeout, error class filtering, ' \
-                       'event callbacks, metrics, and exponential backoff.'
+                     'configurable failure thresholds, timeout, error class filtering, ' \
+                     'event callbacks, metrics, and exponential backoff.'
   spec.homepage = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-circuit'
   spec.license = 'MIT'
 
