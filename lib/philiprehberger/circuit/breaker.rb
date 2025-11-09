@@ -43,6 +43,11 @@ module Philiprehberger
         @mutex.synchronize { transition_to(CLOSED) }
       end
 
+      # Force circuit to open state (administrative trip)
+      def trip!
+        @mutex.synchronize { transition_to(OPEN) }
+      end
+
       private
 
       def init_core_state(opts)
