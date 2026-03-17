@@ -222,7 +222,9 @@ RSpec.describe Philiprehberger::Circuit do
       end
 
       it 'caps timeout at max_timeout' do
-        b = described_class.new(:test, threshold: 1, timeout_strategy: :exponential, base_timeout: 0.1, max_timeout: 0.2)
+        b = described_class.new(
+          :test, threshold: 1, timeout_strategy: :exponential, base_timeout: 0.1, max_timeout: 0.2
+        )
         b.call { raise StandardError } rescue nil # rubocop:disable Style/RescueModifier
         sleep 0.25
         # Reopens on failure in half-open
