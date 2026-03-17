@@ -10,7 +10,8 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Minimal circuit breaker with three states and configurable thresholds'
   spec.description   = 'Circuit breaker pattern with closed, open, and half-open states, ' \
-                       'configurable failure thresholds, timeout, error class filtering, and event callbacks.'
+                       'configurable failure thresholds, timeout, error class filtering, ' \
+                       'event callbacks, metrics, and exponential backoff.'
   spec.homepage      = 'https://github.com/philiprehberger/rb-circuit'
   spec.license       = 'MIT'
 
