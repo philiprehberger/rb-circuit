@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Revert gemspec to single-quoted strings per RuboCop default configuration
+
 ## 0.2.1
 
 - Fix RuboCop Style/StringLiterals violations in gemspec
