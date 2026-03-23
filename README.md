@@ -4,7 +4,7 @@
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-circuit.svg)](https://rubygems.org/gems/philiprehberger-circuit)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-circuit)](LICENSE)
 
-Minimal circuit breaker — three states (closed/open/half-open), configurable thresholds, error class filtering, event callbacks, metrics, and exponential backoff.
+Minimal circuit breaker with configurable thresholds, error filtering, and exponential backoff
 
 ## Requirements
 
