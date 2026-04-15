@@ -2,6 +2,6 @@
 
 module Philiprehberger
   module Circuit
-    VERSION = '0.2.10'
+    VERSION = '0.3.0'
   end
 end

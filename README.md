@@ -97,6 +97,19 @@ breaker.on_close { AlertService.notify("Circuit recovered") }
 breaker.on_half_open { Logger.info("Circuit probing...") }
 ```
 
+### Force trip
+
+Administratively force the circuit into the open state, regardless of current state or failure count:
+
+```ruby
+breaker.trip!
+breaker.state # => :open
+
+# Subsequent calls short-circuit like any other open-state call
+breaker.call(fallback: -> { :queued }) { PaymentGateway.charge(amount) }
+# => :queued
+```
+
 ### Reset Callback
 
 Hook into every state transition for logging or alerting:
@@ -115,6 +128,7 @@ end
 | `#call(fallback: nil) { block }` | Execute with circuit protection |
 | `#state` | Current state (`:closed`, `:open`, `:half_open`) |
 | `#reset!` | Force back to closed |
+| `#trip!` | Force open (administrative trip) |
 | `#metrics` | Returns `{ success_count:, failure_count:, rejected_count:, state_changes: [] }` |
 | `#on_open { }` | Callback when circuit opens |
 | `#on_close { }` | Callback when circuit closes |
