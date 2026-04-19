@@ -816,6 +816,62 @@ RSpec.describe Philiprehberger::Circuit do
       end
     end
 
+    describe '#metrics_reset!' do
+      it 'zeros all counters after successes and failures' do
+        breaker.call { :ok }
+        breaker.call { :ok }
+        breaker.call { raise StandardError } rescue nil # rubocop:disable Style/RescueModifier
+        open_circuit(breaker)
+        breaker.call(fallback: -> { :nope }) { 42 }
+
+        m_before = breaker.metrics
+        expect(m_before[:success_count]).to be > 0
+        expect(m_before[:failure_count]).to be > 0
+        expect(m_before[:rejected_count]).to be > 0
+
+        breaker.metrics_reset!
+        m_after = breaker.metrics
+        expect(m_after[:success_count]).to eq(0)
+        expect(m_after[:failure_count]).to eq(0)
+        expect(m_after[:rejected_count]).to eq(0)
+      end
+
+      it 'does not change the current state when closed' do
+        breaker.call { :ok }
+        expect(breaker.state).to eq(:closed)
+        breaker.metrics_reset!
+        expect(breaker.state).to eq(:closed)
+      end
+
+      it 'keeps an open circuit open' do
+        open_circuit(breaker)
+        expect(breaker.state).to eq(:open)
+        breaker.metrics_reset!
+        expect(breaker.state).to eq(:open)
+      end
+
+      it 'keeps a half_open circuit in half_open' do
+        b = described_class.new(:test, threshold: 1, timeout: 0.1, half_open_requests: 0)
+        b.call { raise StandardError } rescue nil # rubocop:disable Style/RescueModifier
+        sleep 0.15
+        b.call(fallback: -> { :nope }) { 42 }
+        expect(b.state).to eq(:half_open)
+        b.metrics_reset!
+        expect(b.state).to eq(:half_open)
+      end
+
+      it 'clears the state_changes log' do
+        open_circuit(breaker)
+        expect(breaker.metrics[:state_changes]).not_to be_empty
+        breaker.metrics_reset!
+        expect(breaker.metrics[:state_changes]).to be_empty
+      end
+
+      it 'returns self for chaining' do
+        expect(breaker.metrics_reset!).to eq(breaker)
+      end
+    end
+
     def open_circuit(brk)
       3.times do
         brk.call { raise StandardError } rescue nil # rubocop:disable Style/RescueModifier
