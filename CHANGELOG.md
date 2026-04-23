@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-18
+
+### Added
+- `Breaker#metrics_reset!` — zeros `success_count`, `failure_count`, `rejected_count`, and clears the state-change log without altering current state; suitable for periodic metric windows
+
 ## [0.3.0] - 2026-04-15
 
 ### Added

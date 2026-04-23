@@ -8,6 +8,18 @@ module Philiprehberger
         @mutex.synchronize { metrics_snapshot }
       end
 
+      # Zero counters and clear the state-change log without altering
+      # the circuit's current state or transition timestamps.
+      def metrics_reset!
+        @mutex.synchronize do
+          @success_count = 0
+          @metrics_failure_count = 0
+          @rejected_count = 0
+          @state_changes = []
+        end
+        self
+      end
+
       private
 
       def init_metrics

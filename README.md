@@ -74,6 +74,17 @@ breaker.metrics
 
 Each state change entry contains `{ from:, to:, at: }` with the transition timestamp.
 
+### Resetting metrics
+
+Zero the counters and clear the state-change log without touching the current state (useful for periodic metric windows):
+
+```ruby
+breaker.metrics_reset!
+breaker.metrics
+# => { success_count: 0, failure_count: 0, rejected_count: 0, state_changes: [] }
+# breaker.state is unchanged
+```
+
 ### Exponential Backoff
 
 Use exponential backoff for the open-to-half-open timeout:
@@ -130,6 +141,7 @@ end
 | `#reset!` | Force back to closed |
 | `#trip!` | Force open (administrative trip) |
 | `#metrics` | Returns `{ success_count:, failure_count:, rejected_count:, state_changes: [] }` |
+| `#metrics_reset!` | Zero counters and clear state-change log without altering current state |
 | `#on_open { }` | Callback when circuit opens |
 | `#on_close { }` | Callback when circuit closes |
 | `#on_half_open { }` | Callback when circuit enters half-open |
