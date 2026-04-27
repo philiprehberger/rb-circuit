@@ -40,12 +40,36 @@ module Philiprehberger
 
       # Force circuit back to closed state
       def reset!
-        @mutex.synchronize { transition_to(CLOSED) }
+        @mutex.synchronize do
+          @forced = false
+          transition_to(CLOSED)
+        end
       end
 
       # Force circuit to open state (administrative trip)
       def trip!
         @mutex.synchronize { transition_to(OPEN) }
+      end
+
+      # Force circuit to open state for maintenance; rejects all calls until reset
+      def force_open!
+        @mutex.synchronize do
+          transition_to(OPEN)
+          @forced = true
+        end
+      end
+
+      # Force circuit to closed state for maintenance; accepts all calls until reset
+      def force_closed!
+        @mutex.synchronize do
+          transition_to(CLOSED)
+          @forced = true
+        end
+      end
+
+      # Whether the breaker is in a manually forced state
+      def forced?
+        @mutex.synchronize { @forced }
       end
 
       private
@@ -58,6 +82,7 @@ module Philiprehberger
         @failure_count = 0
         @last_failure_time = nil
         @half_open_count = 0
+        @forced = false
       end
 
       def init_backoff_config(opts)
@@ -71,6 +96,8 @@ module Philiprehberger
         @failure_count += 1
         record_metrics_failure
         @last_failure_time = Time.now
+        return if @forced
+
         transition_to(OPEN) if @failure_count >= @threshold
       end
 

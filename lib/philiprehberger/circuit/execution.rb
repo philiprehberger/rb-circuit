@@ -25,6 +25,7 @@ module Philiprehberger
       end
 
       def handle_open(fallback, &)
+        return reject_request(fallback) if @forced
         return open_to_half_open(fallback, &) if timeout_elapsed?
 
         reject_request(fallback)

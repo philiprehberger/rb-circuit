@@ -121,6 +121,25 @@ breaker.call(fallback: -> { :queued }) { PaymentGateway.charge(amount) }
 # => :queued
 ```
 
+### Manual Control
+
+Force the breaker into a fixed state for maintenance windows. While forced, automatic state transitions (failure-based opening, timeout-based half-open probes) are suspended until `reset!` is called:
+
+```ruby
+# Force open during a maintenance window — rejects all calls regardless of timeout
+breaker.force_open!
+breaker.forced? # => true
+breaker.call { :anything } # => raises OpenError
+
+# Force closed to bypass the breaker entirely — accepts all calls, ignores failures
+breaker.force_closed!
+breaker.forced? # => true
+
+# Clear the forced flag and return to normal automatic behavior
+breaker.reset!
+breaker.forced? # => false
+```
+
 ### Reset Callback
 
 Hook into every state transition for logging or alerting:
@@ -140,6 +159,9 @@ end
 | `#state` | Current state (`:closed`, `:open`, `:half_open`) |
 | `#reset!` | Force back to closed |
 | `#trip!` | Force open (administrative trip) |
+| `#force_open!` | Force open and suspend automatic transitions until `#reset!` |
+| `#force_closed!` | Force closed and suspend automatic transitions until `#reset!` |
+| `#forced?` | Whether the breaker is in a manually forced state |
 | `#metrics` | Returns `{ success_count:, failure_count:, rejected_count:, state_changes: [] }` |
 | `#metrics_reset!` | Zero counters and clear state-change log without altering current state |
 | `#on_open { }` | Callback when circuit opens |

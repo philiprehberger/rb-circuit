@@ -77,4 +77,65 @@ RSpec.describe Philiprehberger::Circuit::Breaker do
       expect(breaker.metrics[:rejected_count]).to eq(2)
     end
   end
+
+  describe '#force_open!' do
+    it 'transitions to open and marks the breaker as forced' do
+      breaker.force_open!
+      expect(breaker.state).to eq(:open)
+      expect(breaker.forced?).to be true
+    end
+
+    it 'rejects calls with OpenError' do
+      breaker.force_open!
+      expect { breaker.call { 42 } }.to raise_error(Philiprehberger::Circuit::OpenError)
+    end
+
+    it 'does not transition to half_open even after the timeout elapses' do
+      b = described_class.new(:test, threshold: 3, timeout: 0.1)
+      b.force_open!
+      sleep 0.15
+      expect { b.call { 42 } }.to raise_error(Philiprehberger::Circuit::OpenError)
+      expect(b.state).to eq(:open)
+    end
+
+    it 'returns fallback when provided' do
+      breaker.force_open!
+      result = breaker.call(fallback: -> { :queued }) { 42 }
+      expect(result).to eq(:queued)
+    end
+
+    it 'is cleared by reset!' do
+      breaker.force_open!
+      expect(breaker.forced?).to be true
+      breaker.reset!
+      expect(breaker.forced?).to be false
+      expect(breaker.state).to eq(:closed)
+    end
+  end
+
+  describe '#force_closed!' do
+    it 'transitions to closed and marks the breaker as forced' do
+      breaker.trip!
+      breaker.force_closed!
+      expect(breaker.state).to eq(:closed)
+      expect(breaker.forced?).to be true
+    end
+
+    it 'accepts calls even after threshold failures' do
+      breaker.force_closed!
+      5.times do
+        breaker.call { raise StandardError } rescue nil # rubocop:disable Style/RescueModifier
+      end
+      expect(breaker.state).to eq(:closed)
+      expect(breaker.call { :ok }).to eq(:ok)
+    end
+
+    it 'is cleared by reset!' do
+      breaker.force_closed!
+      expect(breaker.forced?).to be true
+      breaker.reset!
+      expect(breaker.forced?).to be false
+      expect(breaker.state).to eq(:closed)
+    end
+  end
 end

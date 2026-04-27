@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-26
+
+### Added
+- `Breaker#force_open!`, `Breaker#force_closed!`, `Breaker#forced?` for manual breaker control during maintenance — automatic state transitions are suspended while forced
+
 ## [0.4.0] - 2026-04-18
 
 ### Added
