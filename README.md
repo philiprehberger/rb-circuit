@@ -74,6 +74,21 @@ breaker.metrics
 
 Each state change entry contains `{ from:, to:, at: }` with the transition timestamp.
 
+### Last Failure
+
+Inspect the most recent failure recorded by the breaker for diagnostics.
+Returns `nil` when no failure has happened since the last reset.
+
+```ruby
+breaker.call { raise Net::OpenTimeout, 'connection refused' } rescue nil
+
+breaker.last_failure
+# => { at: 2026-04-28 14:32:08 +0000, error_class: Net::OpenTimeout, message: "connection refused" }
+```
+
+`last_failure` is captured for both closed-state failures and half-open
+probe failures, and is cleared by `#metrics_reset!`.
+
 ### Resetting metrics
 
 Zero the counters and clear the state-change log without touching the current state (useful for periodic metric windows):
@@ -163,6 +178,7 @@ end
 | `#force_closed!` | Force closed and suspend automatic transitions until `#reset!` |
 | `#forced?` | Whether the breaker is in a manually forced state |
 | `#metrics` | Returns `{ success_count:, failure_count:, rejected_count:, state_changes: [] }` |
+| `#last_failure` | Returns `{ at:, error_class:, message: }` for the most recent failure (or `nil`) |
 | `#metrics_reset!` | Zero counters and clear state-change log without altering current state |
 | `#on_open { }` | Callback when circuit opens |
 | `#on_close { }` | Callback when circuit closes |

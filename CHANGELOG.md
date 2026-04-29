@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-28
+
+### Added
+- `Breaker#last_failure` — diagnostic accessor returning `{ at:, error_class:, message: }` for the most recent recorded failure (or `nil` if none has occurred since the last reset). Captured for both closed-state and half-open probe failures. Cleared by `metrics_reset!`.
+
 ## [0.5.0] - 2026-04-26
 
 ### Added

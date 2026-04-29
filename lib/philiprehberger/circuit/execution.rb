@@ -20,6 +20,7 @@ module Philiprehberger
         record_success
         result
       rescue *@error_classes => e
+        capture_failure(e)
         record_failure
         raise e
       end
@@ -56,6 +57,7 @@ module Philiprehberger
         record_success
         result
       rescue *@error_classes => e
+        capture_failure(e)
         transition_to(OPEN)
         raise e
       end

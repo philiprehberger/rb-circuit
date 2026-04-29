@@ -8,14 +8,24 @@ module Philiprehberger
         @mutex.synchronize { metrics_snapshot }
       end
 
+      # Most recent failure recorded by the breaker, or nil when none has
+      # occurred since the last reset.
+      #
+      # @return [Hash, nil] { at: Time, error_class: Class, message: String } or nil
+      def last_failure
+        @mutex.synchronize { @last_failure&.dup }
+      end
+
       # Zero counters and clear the state-change log without altering
-      # the circuit's current state or transition timestamps.
+      # the circuit's current state or transition timestamps. Also clears
+      # the last_failure record.
       def metrics_reset!
         @mutex.synchronize do
           @success_count = 0
           @metrics_failure_count = 0
           @rejected_count = 0
           @state_changes = []
+          @last_failure = nil
         end
         self
       end
@@ -27,6 +37,7 @@ module Philiprehberger
         @metrics_failure_count = 0
         @rejected_count = 0
         @state_changes = []
+        @last_failure = nil
       end
 
       def record_success
@@ -39,6 +50,10 @@ module Philiprehberger
 
       def record_metrics_failure
         @metrics_failure_count += 1
+      end
+
+      def capture_failure(error)
+        @last_failure = { at: Time.now, error_class: error.class, message: error.message }
       end
 
       def record_state_change(from, to)

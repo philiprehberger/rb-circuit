@@ -870,6 +870,53 @@ RSpec.describe Philiprehberger::Circuit do
       it 'returns self for chaining' do
         expect(breaker.metrics_reset!).to eq(breaker)
       end
+
+      it 'clears last_failure' do
+        breaker.call { raise StandardError, 'boom' } rescue nil # rubocop:disable Style/RescueModifier
+        expect(breaker.last_failure).not_to be_nil
+        breaker.metrics_reset!
+        expect(breaker.last_failure).to be_nil
+      end
+    end
+
+    describe '#last_failure' do
+      it 'returns nil before any failure' do
+        expect(breaker.last_failure).to be_nil
+      end
+
+      it 'records the most recent failure with class, message, and timestamp' do
+        before = Time.now
+        breaker.call { raise ArgumentError, 'bad input' } rescue nil # rubocop:disable Style/RescueModifier
+        after = Time.now
+
+        info = breaker.last_failure
+        expect(info[:error_class]).to eq(ArgumentError)
+        expect(info[:message]).to eq('bad input')
+        expect(info[:at]).to be_between(before, after)
+      end
+
+      it 'is overwritten by subsequent failures' do
+        breaker.call { raise StandardError, 'first' } rescue nil # rubocop:disable Style/RescueModifier
+        breaker.call { raise 'second' } rescue nil # rubocop:disable Style/RescueModifier
+        info = breaker.last_failure
+        expect(info[:error_class]).to eq(RuntimeError)
+        expect(info[:message]).to eq('second')
+      end
+
+      it 'records a failure during a half-open probe' do
+        b = described_class.new(:test, threshold: 1, timeout: 0.05)
+        b.call { raise StandardError, 'first' } rescue nil # rubocop:disable Style/RescueModifier
+        sleep 0.06
+        b.call { raise 'probe failed' } rescue nil # rubocop:disable Style/RescueModifier
+        expect(b.last_failure[:error_class]).to eq(RuntimeError)
+        expect(b.last_failure[:message]).to eq('probe failed')
+      end
+
+      it 'returns a copy that callers cannot mutate' do
+        breaker.call { raise StandardError, 'x' } rescue nil # rubocop:disable Style/RescueModifier
+        breaker.last_failure[:message] = 'tampered'
+        expect(breaker.last_failure[:message]).to eq('x')
+      end
     end
 
     def open_circuit(brk)
