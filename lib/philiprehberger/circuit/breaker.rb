@@ -72,6 +72,21 @@ module Philiprehberger
         @mutex.synchronize { @forced }
       end
 
+      # Whether the breaker is currently in the closed state
+      def closed?
+        @mutex.synchronize { @state == CLOSED }
+      end
+
+      # Whether the breaker is currently in the open state
+      def open?
+        @mutex.synchronize { @state == OPEN }
+      end
+
+      # Whether the breaker is currently in the half-open state
+      def half_open?
+        @mutex.synchronize { @state == HALF_OPEN }
+      end
+
       private
 
       def init_core_state(opts)

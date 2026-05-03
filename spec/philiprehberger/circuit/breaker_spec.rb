@@ -138,4 +138,46 @@ RSpec.describe Philiprehberger::Circuit::Breaker do
       expect(breaker.state).to eq(:closed)
     end
   end
+
+  describe '#closed? / #open? / #half_open?' do
+    it 'a fresh breaker is closed' do
+      expect(breaker.closed?).to be true
+      expect(breaker.open?).to be false
+      expect(breaker.half_open?).to be false
+    end
+
+    it 'after trip! it is open' do
+      breaker.trip!
+      expect(breaker.open?).to be true
+      expect(breaker.closed?).to be false
+      expect(breaker.half_open?).to be false
+    end
+
+    it 'after timeout it is half_open' do
+      b = described_class.new(:test, threshold: 1, timeout: 0.1, half_open_requests: 0)
+      b.call { raise StandardError } rescue nil # rubocop:disable Style/RescueModifier
+      sleep 0.15
+      b.call(fallback: -> { :nope }) { 42 }
+      expect(b.half_open?).to be true
+      expect(b.open?).to be false
+      expect(b.closed?).to be false
+    end
+
+    it 'reset! returns the breaker to closed' do
+      breaker.trip!
+      breaker.reset!
+      expect(breaker.closed?).to be true
+    end
+
+    it 'only one predicate is true at a time' do
+      states = [
+        breaker,
+        described_class.new(:o).tap(&:trip!)
+      ]
+      states.each do |b|
+        truthy = [b.closed?, b.open?, b.half_open?].count { |v| v }
+        expect(truthy).to eq(1)
+      end
+    end
+  end
 end

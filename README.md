@@ -136,6 +136,20 @@ breaker.call(fallback: -> { :queued }) { PaymentGateway.charge(amount) }
 # => :queued
 ```
 
+### State Predicates
+
+Idiomatic predicate methods for testing the current state without comparing against state symbols:
+
+```ruby
+breaker.closed?    # => true (fresh breaker)
+breaker.open?      # => false
+breaker.half_open? # => false
+
+breaker.trip!
+breaker.open?      # => true
+breaker.closed?    # => false
+```
+
 ### Manual Control
 
 Force the breaker into a fixed state for maintenance windows. While forced, automatic state transitions (failure-based opening, timeout-based half-open probes) are suspended until `reset!` is called:
@@ -172,6 +186,7 @@ end
 | `Breaker.new(name, **opts)` | Create a breaker (see options below) |
 | `#call(fallback: nil) { block }` | Execute with circuit protection |
 | `#state` | Current state (`:closed`, `:open`, `:half_open`) |
+| `#closed?` / `#open?` / `#half_open?` | State predicates |
 | `#reset!` | Force back to closed |
 | `#trip!` | Force open (administrative trip) |
 | `#force_open!` | Force open and suspend automatic transitions until `#reset!` |
